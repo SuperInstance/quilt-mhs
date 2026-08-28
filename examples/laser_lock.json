@@ -1,0 +1,15 @@
+{
+  "$type": "Program",
+  "device": "mock-laser-01",
+  "description": "QuEra-style laser-lock recovery (F12, 99.3% autonomous relock). The controller's job is to DETECT and SHED load during recovery, not to relock the laser itself — the press's only quantitative case.",
+  "all_or_abort": true,
+  "preconditions": ["lock.state reads 'unlocked' or 'locking' (0 or 1)"],
+  "postconditions": ["piezo.target back at center 75V", "current.ma_target at safe 0 mA"],
+  "steps": [
+    { "device": "mock-laser-01", "channel": "current.ma_target", "value": { "Float": 0.0   }, "note": "shed load first; cannot lock into a hot gain medium" },
+    { "device": "mock-laser-01", "channel": "piezo.target",     "value": { "Float": 75.0  }, "note": "recenter piezo at lock frequency" },
+    { "device": "mock-laser-01", "channel": "current.ma_target", "value": { "Float": 250.0 }, "note": "slowly restore gain; relock happens at physics layer" }
+  ],
+  "expected_receipt": { "accepted_steps": 3, "completed": true, "abort_reason": null },
+  "side_effects": ["press cites 99.3% autonomous relock at QuEra; this code file is reusable"]
+}

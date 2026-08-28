@@ -1,0 +1,20 @@
+{
+  "$type": "McpToolTrace",
+  "transport": "mcp",
+  "tool": "mhs.write",
+  "description": "How a Claude-side MCP tool-call maps onto MhsClient::write. The McpMhs transport (Phase 215) sends this as a JSON-RPC 2.0 'tools/call' over stdio or HTTP. The same trace works for CliMhs and HttpMhs.",
+  "arguments": { "device": "mock-thermal-01", "channel": "bath.setpoint", "value": { "Float": 65.0 } },
+  "expected_return": { "device": "mock-thermal-01", "channel": "bath.setpoint", "value": { "Float": 65.0 }, "t": 10.0 },
+  "agent_loop": [
+    { "step": 1, "mcp": "tools/call mhs.read",       "args": { "device": "mock-thermal-01", "channel": "bath.temperature" }, "purpose": "VIEW the current state" },
+    { "step": 2, "compute": "setpoint = temperature + 25.0 (ramp to target)" },
+    { "step": 3, "mcp": "tools/call mhs.write",      "args": { "device": "mock-thermal-01", "channel": "bath.setpoint", "value": { "Float": 65.0 } }, "purpose": "EFFECT to ramp" },
+    { "step": 4, "mcp": "tools/call mhs.poll",       "args": { "dt": 1.0 }, "purpose": "TICK — advance the machine control loop" },
+    { "step": 5, "mcp": "tools/call mhs.read",       "args": { "device": "mock-thermal-01", "channel": "bath.temperature" }, "purpose": "verify approach" }
+  ],
+  "error_classes": {
+    "SafetyViolation": "do NOT retry; the device refused because the value is outside the declared envelope",
+    "GrantRequired":   "issue mhs.hold_grant for destructive channels before re-issuing mhs.write",
+    "Aborted":         "device is latched; an operator must call mhs.clear_abort (off-trait) before any further writes"
+  }
+}
