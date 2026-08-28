@@ -11,6 +11,13 @@ description.workspace = true
 serde = { workspace = true }
 serde_json = { workspace = true }
 schemars = { workspace = true }
+ureq = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+
+[features]
+default = []
+http-transport = ["ureq"]
+async-federation = ["tokio"]
 
 [[bin]]
 name = "gen-schemas"
