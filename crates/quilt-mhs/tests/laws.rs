@@ -190,6 +190,29 @@ fn device_enforces_limits_through_adapter() {
     assert_eq!(v, MhsValue::Float(0.0), "cell value unchanged after rejection");
 }
 
+// Interlocks are multi-holder BY DESIGN and visible as first-class state:
+// several cells (hands) may share one grant; forgetting each holder
+// releases independently; the LAST holder out parks the machine. Design
+// review (2026-08-27) asked for this to be explicit + tested — here it is.
+#[test]
+fn grants_are_multi_holder_and_visible() {
+    let mut a = adapter();
+    a.bind_to_device("grip.a", &"mock-arm-01".to_string(), "gripper.cmd", &[]).unwrap();
+    a.bind_to_device("grip.b", &"mock-arm-01".to_string(), "gripper.cmd", &[]).unwrap();
+    a.grant("grip.a", &"mock-arm-01".to_string(), "gripper.cmd").unwrap();
+    a.grant("grip.b", &"mock-arm-01".to_string(), "gripper.cmd").unwrap();
+    let holders = a.interlocks().get(&("mock-arm-01".to_string(), "gripper.cmd".to_string())).unwrap();
+    assert_eq!(holders.len(), 2, "both holders visible as first-class state");
+    // first holder out: grant survives, no abort
+    let r = a.forget("grip.a").unwrap();
+    assert_eq!(r.devices_aborted.len(), 0, "shared grant survives one holder leaving");
+    assert_eq!(a.interlocks().get(&("mock-arm-01".to_string(), "gripper.cmd".to_string())).unwrap().len(), 1);
+    // last holder out: parked
+    let r = a.forget("grip.b").unwrap();
+    assert_eq!(r.devices_aborted, vec!["mock-arm-01".to_string()]);
+    assert!(a.interlocks().is_empty());
+}
+
 // Destructive channels are interlock-gated end to end.
 #[test]
 fn destructive_writes_require_grant() {

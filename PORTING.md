@@ -77,7 +77,7 @@ FORGET — interlocks are forgettable state, not ambient permission.
 
 ## The conformance-test contract
 
-`mhs::conformance::run_conformance(&mut dyn MhsClient)` runs C1..C8 against
+`mhs::conformance::run_conformance(&mut dyn MhsClient)` runs C1..C9 against
 *any* implementation:
 
 - C1 discovery returns devices
@@ -90,6 +90,7 @@ FORGET — interlocks are forgettable state, not ambient permission.
 - C6 reads are pure/repeatable
 - C7 chained program (code file) completes
 - C8 (assumption A-6) abort latches against further writes
+- C9 (assumption A-9) abort parks writable channels at the range floor
 
 Checks tagged as assumptions are reported separately (`core_passes` ignores
 them) so a real SDK can disagree with an *assumption* without failing the
@@ -101,6 +102,13 @@ checks, and `tests/laws.rs` passes unchanged (the laws must not depend on
 the transport).
 
 ## Swapping the transport when the real SDK lands
+
+Design review (2026-08-27, independent pass) sharpened this section:
+there are **two seams, not one**. PORT 1 (`MhsClient`) is the behavioral
+seam; `mhs/types.rs` is the vocabulary seam. The real SDK ships its own
+manifest/command/sample types — reconciliation happens in `types.rs`
+(newtype wrappers around SDK types) plus a `gen-schemas` diff. Plan for
+both files changing and nothing else.
 
 1. Add the official SDK as an optional dependency (feature `mhs-official`).
 2. Write ONE file: `struct OfficialSdkClient { ... }` implementing
@@ -130,6 +138,34 @@ surface: define/set/get/tick + manifest) to *expose* your system as an
 MHS-addressable substrate. Intra-quilt (sheets driving sheets through the
 enforced seam) and inter-quilt (two runtimes federation-testing each other)
 come along for free — `tests/federation.rs` is the executable spec.
+
+## Known limitations (called out, not hidden)
+
+- **Synchronous core, by design.** Everything here is sync (quilt-rust's
+  async-at-the-boundary philosophy). Real async transports introduce
+  TOCTOU windows the sync design does not model (two controllers racing
+  a shared channel; an in-flight write landing after an abort). When a
+  real transport lands, ordering/lease semantics for concurrent writers
+  get decided there and pinned by a new conformance check — flagged in
+  MHS-SPEC-WATCH as follow-up, not silently assumed away.
+- **Links are persistent graph edges** (quilt semantics); there is no
+  auto-expiring/ephemeral link. A transient coupling is LINK + EFFECT +
+  FORGET — three explicit opcodes, no hidden temporal decay.
+- **Grants are multi-holder by design**: several cells may share one
+  interlock; each FORGET releases its holder independently; the last
+  holder out parks the device (`tests/laws.rs::grants_are_multi_holder_and_visible`).
+
+## Operator notes: when a device aborts
+
+- A rejected program step aborts every device the program touched and
+  returns a `ProgramReceipt { accepted_steps, abort_reason }` — partial
+  application is reported, never hidden.
+- Post-abort, writes are refused (`MhsError::Aborted`) until an operator
+  clears the latch (`MockMHS::clear_abort` /
+  `QuiltDeviceProfile::clear_abort`). Agents do not unlatch their own
+  aborts — that is the point.
+- Abort parks ranged writable channels at the contract floor (A-9);
+  conformance C9 checks this.
 
 ## Regulatory note (EU)
 

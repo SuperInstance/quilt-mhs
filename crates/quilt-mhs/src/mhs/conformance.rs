@@ -145,6 +145,21 @@ pub fn run_conformance(client: &mut dyn MhsClient) -> Vec<CheckResult> {
         None => fail_assume("C8", "abort latches against further writes", "write after abort ACCEPTED".into(), true),
     });
 
+    // C9 (A-9) — abort parks writable channels: every ranged writable is at
+    // the safe end of its range post-abort (documented teardown semantics;
+    // a real SDK may specify its own park behavior — this flags it).
+    let m2 = client.manifest(&device).ok();
+    let parked = m2.map(|m| {
+        m.writable.iter().all(|w| {
+            client.read(&device, &w.name).ok().and_then(|s| s.value.as_f64()).map(|v| w.range.map(|r| v == r.0).unwrap_or(true)).unwrap_or(true)
+        })
+    });
+    checks.push(match parked {
+        Some(true) => ok_assume("C9", "abort parks writable channels at range floor", "A-9: park behavior assumed".into(), true),
+        Some(false) => fail_assume("C9", "abort parks writable channels at range floor", "some writable not parked".into(), true),
+        None => fail_assume("C9", "abort parks writable channels at range floor", "unreadable post-abort".into(), true),
+    });
+
     checks
 }
 
