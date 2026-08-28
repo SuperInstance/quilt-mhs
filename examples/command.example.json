@@ -1,0 +1,6 @@
+{
+  "$type": "Command",
+  "device": "mock-thermal-01",
+  "channel": "bath.setpoint",
+  "value": { "Float": 65.0 }
+}

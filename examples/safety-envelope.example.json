@@ -1,0 +1,10 @@
+{
+  "$type": "SafetyEnvelope",
+  "channel_limits": {
+    "joint1.target": [-90.0, 90.0],
+    "gripper.cmd": [0.0, 1.0]
+  },
+  "max_write_rate_hz": { "joint1.target": 10.0 },
+  "destructive_requires_grant": true,
+  "abort_supported": true
+}

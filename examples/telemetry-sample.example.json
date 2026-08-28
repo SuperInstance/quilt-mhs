@@ -1,0 +1,7 @@
+{
+  "$type": "Sample",
+  "device": "mock-thermal-01",
+  "channel": "bath.temperature",
+  "value": { "Float": 48.76 },
+  "t": 10.0
+}

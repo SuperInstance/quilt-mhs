@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AbortReceipt",
+  "description": "Receipt for an abort/teardown. Assumption A-6: exact MHS abort shape unknown; we record the reason and the device's post-abort state.",
+  "type": "object",
+  "required": [
+    "device",
+    "latched",
+    "reason"
+  ],
+  "properties": {
+    "device": {
+      "type": "string"
+    },
+    "latched": {
+      "description": "True when writes are refused until an operator clears the abort.",
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string"
+    }
+  }
+}

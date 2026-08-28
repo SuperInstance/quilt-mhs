@@ -1,0 +1,30 @@
+{
+  "$type": "DeviceManifest",
+  "device_id": "quilt-lab-01",
+  "model": "QuiltSheet 0.1",
+  "firmware": "quilt-sheet-0.1",
+  "tags": [
+    "This substrate is a live quilt sheet; every channel is a cell.",
+    "engine.scram is destructive: it kills the engine and needs an interlock grant to command."
+  ],
+  "readable": [
+    { "name": "bilge.depth", "unit": null, "writable": false, "range": [0.0, 2.0], "destructive": false },
+    { "name": "pump.duty", "unit": null, "writable": true, "range": [0.0, 100.0], "destructive": false }
+  ],
+  "writable": [
+    { "name": "pump.duty", "unit": null, "writable": true, "range": [0.0, 100.0], "destructive": false },
+    { "name": "engine.throttle", "unit": null, "writable": true, "range": [0.0, 100.0], "destructive": false },
+    { "name": "engine.scram", "unit": null, "writable": true, "range": null, "destructive": true }
+  ],
+  "safety": {
+    "channel_limits": {
+      "bilge.depth": [0.0, 2.0],
+      "engine.throttle": [0.0, 100.0],
+      "pump.duty": [0.0, 100.0]
+    },
+    "max_write_rate_hz": {},
+    "destructive_requires_grant": true,
+    "abort_supported": true
+  },
+  "transport": "quilt-sheet-inprocess"
+}

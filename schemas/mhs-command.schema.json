@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Command",
+  "description": "A single write step, used both for direct writes and for chained programs (\"code files\" in the announcement: deterministic sequences the device runs without the agent reasoning at every step).",
+  "type": "object",
+  "required": [
+    "channel",
+    "device",
+    "value"
+  ],
+  "properties": {
+    "channel": {
+      "type": "string"
+    },
+    "device": {
+      "type": "string"
+    },
+    "value": {
+      "$ref": "#/definitions/MhsValue"
+    }
+  },
+  "definitions": {
+    "MhsValue": {
+      "description": "A scalar value crossing the MHS boundary. Deliberately tiny: the press surface is \"read\" (get temperature) / \"write\" (set temperature) style primitives, so scalars plus null cover the announced shape without inventing container semantics.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "Null"
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
+            "Bool"
+          ],
+          "properties": {
+            "Bool": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "Int"
+          ],
+          "properties": {
+            "Int": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "Float"
+          ],
+          "properties": {
+            "Float": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "Str"
+          ],
+          "properties": {
+            "Str": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

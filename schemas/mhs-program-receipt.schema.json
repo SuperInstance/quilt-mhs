@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProgramReceipt",
+  "description": "Receipt for a chained program (\"code file\"). All steps run or the device aborts — partial application is reported, never hidden.",
+  "type": "object",
+  "required": [
+    "accepted_steps",
+    "completed"
+  ],
+  "properties": {
+    "abort_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "accepted_steps": {
+      "type": "integer",
+      "format": "uint",
+      "minimum": 0.0
+    },
+    "completed": {
+      "type": "boolean"
+    }
+  }
+}

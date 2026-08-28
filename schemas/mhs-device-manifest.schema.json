@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeviceManifest",
+  "description": "The \"reference file\" concept from the announcement: what the device is, what it can measure, what can be adjusted, which limits are enforced, plus the natural-language `tags` the announcement describes (e.g. the weight of a robot arm, stored as text rather than code).",
+  "type": "object",
+  "required": [
+    "device_id",
+    "firmware",
+    "model",
+    "readable",
+    "safety",
+    "tags",
+    "transport",
+    "writable"
+  ],
+  "properties": {
+    "device_id": {
+      "type": "string"
+    },
+    "firmware": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "readable": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Channel"
+      }
+    },
+    "safety": {
+      "$ref": "#/definitions/SafetyEnvelope"
+    },
+    "tags": {
+      "description": "Natural-language knowledge the announcement says users (or an interviewing agent) write into the driver. Preserved verbatim.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "transport": {
+      "description": "Transport identifier for the current session, e.g. \"mock\", \"mcp\", \"cli\", \"code-files\". The announcement names MCP, CLI, and code files as the three control mechanisms.",
+      "type": "string"
+    },
+    "writable": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Channel"
+      }
+    }
+  },
+  "definitions": {
+    "Channel": {
+      "description": "A channel on a device — the addressable read/write surface. Press names read (\"get temperature\") and write (\"set temperature\") as the core primitives; a device offers named channels for each.",
+      "type": "object",
+      "required": [
+        "name",
+        "writable"
+      ],
+      "properties": {
+        "destructive": {
+          "description": "True if writing this channel is destructive / irreversible. Destructive channels require an explicit grant (our forking rule: no destructive ops without explicit grant).",
+          "default": false,
+          "type": "boolean"
+        },
+        "name": {
+          "description": "Channel name, e.g. `bath.setpoint`, `joint1.target`.",
+          "type": "string"
+        },
+        "range": {
+          "description": "Declared numeric range, if any. The MHS driver \"enforces\" safety limits (press, 2026-08-27); we model enforcement per channel.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": [
+            {
+              "type": "number",
+              "format": "double"
+            },
+            {
+              "type": "number",
+              "format": "double"
+            }
+          ],
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "unit": {
+          "description": "Physical unit if numeric, e.g. \"degC\", \"deg\", \"kg\".",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "writable": {
+          "description": "Whether the agent may write this channel (readable channels are listed in the manifest's `readable` set).",
+          "type": "boolean"
+        }
+      }
+    },
+    "SafetyEnvelope": {
+      "description": "Safety envelope a device declares and enforces. The announcement says the MHS driver produces a reference file describing \"what it can measure, what can be adjusted, and what safety limits will be enforced\" — this is our concretization of that sentence.",
+      "type": "object",
+      "required": [
+        "abort_supported",
+        "channel_limits",
+        "destructive_requires_grant",
+        "max_write_rate_hz"
+      ],
+      "properties": {
+        "abort_supported": {
+          "description": "Device supports an abort/estop path. Assumption A-6 (press implies enforcement and error recovery; exact surface unknown).",
+          "type": "boolean"
+        },
+        "channel_limits": {
+          "description": "Hard per-channel numeric limits; writes outside are rejected by the device, not by agent politeness.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": [
+              {
+                "type": "number",
+                "format": "double"
+              },
+              {
+                "type": "number",
+                "format": "double"
+              }
+            ],
+            "maxItems": 2,
+            "minItems": 2
+          }
+        },
+        "destructive_requires_grant": {
+          "description": "Destructive channels may only be written while an interlock grant is held (explicit, revocable, forgettable).",
+          "type": "boolean"
+        },
+        "max_write_rate_hz": {
+          "description": "Maximum accepted write rate per channel, Hz. Assumption A-2.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      }
+    }
+  }
+}
