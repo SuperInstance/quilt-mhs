@@ -3,6 +3,10 @@
 > **A quilt cell is an addressable resource. An MHS device is an addressable
 > resource. This repo is the two adapters that make those the same sentence.**
 
+<p align="center">
+  <img src="docs/images/hero.jpg" width="680" alt="Two warm systems — a patchwork of fabric cells and a shelf of brass lab instruments — joined by a single amber-lit bridge where they meet">
+</p>
+
 Anthropic announced the **Model Hardware Standard (MHS)** on 2026-08-27: a
 shared spec for AI agents to safely operate physical devices — microscopes,
 liquid handlers, robotic arms — "USB-C" style ([CNBC, 2026-08-27][cnbc]).
