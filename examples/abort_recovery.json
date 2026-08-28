@@ -1,0 +1,23 @@
+{
+  "$type": "Program",
+  "device": "mock-arm-01",
+  "description": "The 5+1+1 story end-to-end: destructive channel written under an explicit grant, then released by FORGET (abort). C9 — abort parks writable channels at the safe end of their range.",
+  "all_or_abort": true,
+  "note": "engine.scram is destructive; requires hold_grant then release_grant (A-7). After abort, the device latches until clear_abort is called by an operator (off-trait).",
+  "interlocks": {
+    "hold_grant": ["gripper.cmd"],
+    "release_grant_after": true
+  },
+  "steps": [
+    { "device": "mock-arm-01", "channel": "gripper.cmd", "value": { "Float": 1.0 } }
+  ],
+  "post_steps": [
+    { "device": "mock-arm-01", "action": "abort", "reason": "operator tripped estop" }
+  ],
+  "expected_receipt": { "accepted_steps": 1, "completed": true, "abort_reason": null },
+  "post_abort_state": {
+    "gripper.cmd": "parked at 0.0 (safe end of 0..1)",
+    "joint1.target": "parked at -90.0 (safe end of -90..90)",
+    "latched": true
+  }
+}

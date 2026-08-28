@@ -1,0 +1,19 @@
+{
+  "$type": "Program",
+  "device": "mock-microscope-01",
+  "description": "Multi-well scan with autofocus: move XY to 3 well positions, focus Z at each, snap the camera. This is the 'tile-and-shoot' canonical for high-content screening.",
+  "all_or_abort": true,
+  "steps": [
+    { "device": "mock-microscope-01", "channel": "stage.x_target",     "value": { "Float": 10.0  } },
+    { "device": "mock-microscope-01", "channel": "stage.y_target",     "value": { "Float": 5.0   } },
+    { "device": "mock-microscope-01", "channel": "objective.z_target", "value": { "Float": 0.012 } },
+    { "device": "mock-microscope-01", "channel": "camera.exposure_ms", "value": { "Float": 50.0  } },
+    { "device": "mock-microscope-01", "channel": "stage.x_target",     "value": { "Float": 19.0  } },
+    { "device": "mock-microscope-01", "channel": "stage.y_target",     "value": { "Float": 5.0   } },
+    { "device": "mock-microscope-01", "channel": "objective.z_target", "value": { "Float": 0.012 } },
+    { "device": "mock-microscope-01", "channel": "stage.x_target",     "value": { "Float": 10.0  } },
+    { "device": "mock-microscope-01", "channel": "stage.y_target",     "value": { "Float": 14.0  } },
+    { "device": "mock-microscope-01", "channel": "objective.z_target", "value": { "Float": 0.012 } }
+  ],
+  "expected_receipt": { "accepted_steps": 10, "completed": true, "abort_reason": null }
+}

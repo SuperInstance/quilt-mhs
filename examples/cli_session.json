@@ -1,0 +1,21 @@
+{
+  "$type": "CliSession",
+  "description": "F9 names the CLI as one of three announced MHS control mechanisms. The CliMhs transport (Phase 215) implements the same flow over a subprocess driver; this trace is replayable end-to-end.",
+  "shell": "bash",
+  "commands": [
+    "mhs discover",
+    "mhs manifest --device mock-thermal-01",
+    "mhs read --device mock-thermal-01 --channel bath.temperature",
+    "mhs write --device mock-thermal-01 --channel bath.setpoint --value 65.0",
+    "mhs run-program --device mock-thermal-01 --file incubator_loop.json",
+    "mhs abort --device mock-thermal-01 --reason 'overtemp detected'",
+    "mhs clear-abort --device mock-thermal-01"
+  ],
+  "expected_outputs": {
+    "discover": "mock-arm-01\nmock-thermal-01\nmock-incubator-01\nmock-microscope-01\nmock-plate-handler-01\nmock-laser-01",
+    "manifest": "DeviceManifest with 1 readable, 2 writable channels, SafetyEnvelope with channel_limits + max_write_rate_hz",
+    "read":     "Sample { device: 'mock-thermal-01', channel: 'bath.temperature', value: Float(22.0), t: 0.0 }",
+    "write":    "Sample { ... value: Float(65.0), t: 0.0 } (or MhsError::SafetyViolation if out of range)",
+    "abort":    "AbortReceipt { device: 'mock-thermal-01', reason: 'overtemp detected', latched: true }"
+  }
+}

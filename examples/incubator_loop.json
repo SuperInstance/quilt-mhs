@@ -1,0 +1,14 @@
+{
+  "$type": "Program",
+  "device": "mock-incubator-01",
+  "description": "CO2 drift-correction: bring the chamber to mammalian-cell-culture standard (37 degC, 5% CO2, 95% humidity). The canonical 'set up an experiment' step.",
+  "all_or_abort": true,
+  "steps": [
+    { "device": "mock-incubator-01", "channel": "chamber.setpoint",         "value": { "Float": 37.0 } },
+    { "device": "mock-incubator-01", "channel": "chamber.co2_setpoint",     "value": { "Float": 5.0  } },
+    { "device": "mock-incubator-01", "channel": "chamber.humidity_setpoint","value": { "Float": 95.0 } }
+  ],
+  "preconditions": ["chamber door closed", "CO2 tank above 10%"],
+  "postconditions": ["chamber.temperature within 0.5 degC of 37", "chamber.co2 within 0.2% of 5"],
+  "expected_receipt": { "accepted_steps": 3, "completed": true, "abort_reason": null }
+}

@@ -1,0 +1,22 @@
+{
+  "$type": "Program",
+  "device": "mock-arm-01",
+  "all_or_abort": true,
+  "description": "F10 — chained driver commands the device runs without per-step agent reasoning. This is the 'code file' surface: deterministic, all-or-abort, the agent hands the file to the device and the device executes.",
+  "steps": [
+    { "device": "mock-arm-01", "channel": "gripper.cmd",   "value": { "Float": 0.0  }, "note": "open gripper" },
+    { "device": "mock-arm-01", "channel": "joint1.target", "value": { "Float": 30.0 }, "note": "move to pick" },
+    { "device": "mock-arm-01", "channel": "joint1.target", "value": { "Float": -15.0 }, "note": "move to place" },
+    { "device": "mock-arm-01", "channel": "gripper.cmd",   "value": { "Float": 1.0  }, "note": "close gripper (destructive; requires hold_grant first)" }
+  ],
+  "interlocks": {
+    "hold_grant": ["gripper.cmd"],
+    "release_grant_after": true,
+    "note": "F9's code-files story: the agent pre-bakes the recipe; the device runs it without reasoning at every step."
+  },
+  "expected_receipt": {
+    "accepted_steps": 4,
+    "completed": true,
+    "abort_reason": null
+  }
+}

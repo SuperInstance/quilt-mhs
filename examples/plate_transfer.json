@@ -1,0 +1,23 @@
+{
+  "$type": "Program",
+  "device": "mock-plate-handler-01",
+  "description": "96->384 well transfer: aspirate 2.5 uL from source well A1, dispense into destination well A1 of a 384-well plate. F10 'learned procedure' — agent pre-bakes the recipe.",
+  "all_or_abort": true,
+  "interlocks": {
+    "hold_grant": ["pipette.volume_ul_target", "plate.holder"],
+    "release_grant_after": true
+  },
+  "steps": [
+    { "device": "mock-plate-handler-01", "channel": "plate.holder",            "value": { "Float": 1.0 } },
+    { "device": "mock-plate-handler-01", "channel": "arm.x_target",            "value": { "Float": 14.0 } },
+    { "device": "mock-plate-handler-01", "channel": "arm.y_target",            "value": { "Float": 11.0 } },
+    { "device": "mock-plate-handler-01", "channel": "arm.z_target",            "value": { "Float": 5.0  } },
+    { "device": "mock-plate-handler-01", "channel": "pipette.volume_ul_target", "value": { "Float": 2.5 } },
+    { "device": "mock-plate-handler-01", "channel": "plate.holder",            "value": { "Float": 2.0 } },
+    { "device": "mock-plate-handler-01", "channel": "arm.x_target",            "value": { "Float": 14.0 } },
+    { "device": "mock-plate-handler-01", "channel": "arm.y_target",            "value": { "Float": 11.0 } },
+    { "device": "mock-plate-handler-01", "channel": "arm.z_target",            "value": { "Float": 5.0  } },
+    { "device": "mock-plate-handler-01", "channel": "pipette.volume_ul_target", "value": { "Float": 0.0 } }
+  ],
+  "expected_receipt": { "accepted_steps": 10, "completed": true, "abort_reason": null }
+}
