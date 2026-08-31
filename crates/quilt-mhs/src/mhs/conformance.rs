@@ -185,6 +185,8 @@ pub fn run_conformance(client: &mut dyn MhsClient) -> Vec<CheckResult> {
         }
         (Ok(p), _) if p.completed => fail("C10", "run_program with bad step aborts and latches", "program completed with out-of-limit step".into()),
         (Err(e), _) => fail("C10", "run_program with bad step aborts and latches", format!("transport error: {e}")),
+        (Ok(p), None) => fail("C10", "run_program with bad step aborts and latches", format!("accepted={} but write succeeded after abort (no latch)", p.accepted_steps)),
+        (Ok(p), Some(_)) => fail("C10", "run_program with bad step aborts and latches", format!("accepted={} unexpected error after abort", p.accepted_steps)),
     });
 
     // C11 — multi-device interleaving: writes to two devices don't bleed.
